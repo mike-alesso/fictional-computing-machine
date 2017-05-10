@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="JavaFXApplication1.jnlp">
+  <information>
+    <title>JavaFXApplication1</title>
+    <vendor>michael</vendor>
+    <description>null</description>
+    <offline-allowed/>
+  </information>
+  <resources>
+    <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="JavaFXApplication1.jar" size="1580022" download="eager" />
+    <jar href="lib/c3p0-0.9.5.2.jar" size="497865" download="eager" />
+    <jar href="lib/c3p0-oracle-thin-extras-0.9.5.2.jar" size="2721" download="eager" />
+    <jar href="lib/jfxtras-agenda-8.0-r5.jar" size="220654" download="eager" />
+    <jar href="lib/jfxtras-all-8.0-r5.jar" size="261" download="eager" />
+    <jar href="lib/jfxtras-common-8.0-r5.jar" size="54046" download="eager" />
+    <jar href="lib/jfxtras-controls-8.0-r5.jar" size="267283" download="eager" />
+    <jar href="lib/mchange-commons-java-0.2.11.jar" size="606472" download="eager" />
+    <jar href="lib/mysql-connector-java-5.1.41-bin.jar" size="992808" download="eager" />
+    <jar href="lib/tornadofx-controls-1.0.5.jar" size="57150" download="eager" />
+  </resources>
+  <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="JavaFXApplication1" >
+    <param name="requiredFXVersion" value="8.0+"/>
+  </applet-desc>
+  <jfx:javafx-desc  width="800" height="600" main-class="javafxapplication1.JavaFXApplication1"  name="JavaFXApplication1" />
+  <update check="always"/>
+</jnlp>
