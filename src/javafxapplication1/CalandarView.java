@@ -97,7 +97,6 @@ public class CalandarView {
 		ScrollPane scroller = new ScrollPane(calendarView);
 		
 		Scene scene = new Scene(scroller);
-		scene.getStylesheets().add(getClass().getResource("calendar-view.css").toExternalForm());
 		primaryStage.setScene(scene);
 		primaryStage.show();
 		
@@ -110,7 +109,8 @@ public class CalandarView {
 			mouseAnchor.set(timeSlot);
 			timeSlot.getView().startFullDrag();
 			timeSlots.forEach(slot -> 
-				slot.setSelected(slot == timeSlot));
+				slot.setSelected(slot == timeSlot)
+                        );
 		});
 		
 		timeSlot.getView().setOnMouseDragEntered(event -> {
@@ -151,57 +151,58 @@ public class CalandarView {
 	// Has a selected property just to represent selection.
 	
 	public static class TimeSlot {
+            private final LocalDateTime start ;
+            private final Duration duration ;
+            private final Region view ;
 
-		private final LocalDateTime start ;
-		private final Duration duration ;
-		private final Region view ;
-		
-		private final BooleanProperty selected = new SimpleBooleanProperty();
-		
-		public final BooleanProperty selectedProperty() {
-			return selected ;
-		}
-		
-		public final boolean isSelected() {
-			return selectedProperty().get();
-		}
-		
-		public final void setSelected(boolean selected) {
-			selectedProperty().set(selected);
-		}
-		
-		public TimeSlot(LocalDateTime start, Duration duration) {
-			this.start = start ;
-			this.duration = duration ;
-			
-			view = new Region();
-			view.setMinSize(80, 20);
-			view.getStyleClass().add("time-slot");
-			
-			selectedProperty().addListener((obs, wasSelected, isSelected) -> 
-				view.pseudoClassStateChanged(SELECTED_PSEUDO_CLASS, isSelected));
+            private final BooleanProperty selected = new SimpleBooleanProperty();
 
-		}
-		
-		public LocalDateTime getStart() {
-			return start ;
-		}
-		
-		public LocalTime getTime() {
-			return start.toLocalTime() ;
-		}
-		
-		public DayOfWeek getDayOfWeek() {
-			return start.getDayOfWeek() ;
-		}
-		
-		public Duration getDuration() {
-			return duration ;
-		}
-		
-		public Node getView() {
-			return view;
-		}
+            public final BooleanProperty selectedProperty() {
+                    return selected ;
+            }
+
+            public final boolean isSelected() {
+                    return selectedProperty().get();
+            }
+
+            public final void setSelected(boolean selected) {
+                    selectedProperty().set(selected);
+            }
+
+            public TimeSlot(LocalDateTime start, Duration duration) {
+                    this.start = start ;
+                    this.duration = duration ;
+
+                    view = new Region();
+                    view.setMinSize(80, 20);
+                    view.setStyle("-fx-background-color: black, white;  -fx-background-insets: 0, 1 1 0 0; ");
+                    view.getStyleClass().add("time-slot");
+
+                    selectedProperty().addListener((obs, wasSelected, isSelected) -> 
+                            view.setStyle("-fx-background-color: honeydew ;")
+                    );
+
+            }
+
+            public LocalDateTime getStart() {
+                    return start ;
+            }
+
+            public LocalTime getTime() {
+                    return start.toLocalTime() ;
+            }
+
+            public DayOfWeek getDayOfWeek() {
+                    return start.getDayOfWeek() ;
+            }
+
+            public Duration getDuration() {
+                    return duration ;
+            }
+
+            public Node getView() {
+                    return view;
+            }
 		
 	}
 }

@@ -8,7 +8,7 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="JavaFXApplication1.jar" size="1580022" download="eager" />
+    <jar href="JavaFXApplication1.jar" size="1589316" download="eager" />
     <jar href="lib/c3p0-0.9.5.2.jar" size="497865" download="eager" />
     <jar href="lib/c3p0-oracle-thin-extras-0.9.5.2.jar" size="2721" download="eager" />
     <jar href="lib/jfxtras-agenda-8.0-r5.jar" size="220654" download="eager" />

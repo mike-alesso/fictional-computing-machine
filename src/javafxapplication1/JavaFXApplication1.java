@@ -20,12 +20,16 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -46,6 +50,7 @@ import javafx.scene.paint.Color;
 import javafx.util.Callback;
 import javafxapplication1.entities.Address;
 import javafxapplication1.entities.Appointment;
+import javafxapplication1.entities.AppointmentTypeRpt;
 import javafxapplication1.entities.City;
 import javafxapplication1.entities.Country;
 import javafxapplication1.entities.Customer;
@@ -115,8 +120,8 @@ public class JavaFXApplication1 extends Application {
         PasswordField password = new PasswordField();
         password.setPromptText(passwordText);
         
-        Label tzLbl = new Label(tzButtonText);
-        ComboBox<TimeZoneDisplay> timeZoneMenu = new ComboBox<TimeZoneDisplay>(FXCollections.observableList(Utility.getTimezones()));
+        //Label tzLbl = new Label(tzButtonText);
+        //ComboBox<TimeZoneDisplay> timeZoneMenu = new ComboBox<TimeZoneDisplay>(FXCollections.observableList(Utility.getTimezones()));
         
         Button loginBtn = new Button();
         loginBtn.setText(loginButtonText);
@@ -128,7 +133,7 @@ public class JavaFXApplication1 extends Application {
                 System.out.println("Logging in!");
                 Utility utl = new Utility();
                 try {
-                    utl.login(userName.getText(), password.getText(), lo.getLanguage(), timeZoneMenu.getValue());
+                    utl.login(userName.getText(), password.getText(), lo.getLanguage());
                     utl.appointmentReminder(userName.getText());
                     createMainMenuScreen(primaryStage);
                 } catch (SQLException ex) {
@@ -155,22 +160,16 @@ public class JavaFXApplication1 extends Application {
 
         hbox1.getChildren().addAll(userName, password);
         
+        
         HBox hbox2 = new HBox();
         hbox2.setPadding(new Insets(15, 12, 15, 12));
         hbox2.setSpacing(10);
         hbox2.setStyle("-fx-background-color: #336699;");
 
-        hbox2.getChildren().addAll(tzLbl, timeZoneMenu);
-        
-        HBox hbox3 = new HBox();
-        hbox3.setPadding(new Insets(15, 12, 15, 12));
-        hbox3.setSpacing(10);
-        hbox3.setStyle("-fx-background-color: #336699;");
-
-        hbox3.getChildren().addAll(loginBtn);
+        hbox2.getChildren().addAll(loginBtn);
         
         //Create login stage
-        vbox.getChildren().addAll(hbox1, hbox2, hbox3);
+        vbox.getChildren().addAll(hbox1, hbox2);
         scene = new Scene(vbox, 800, 350);
         
         hbox1.requestFocus();
@@ -225,14 +224,15 @@ public class JavaFXApplication1 extends Application {
             }
         });
         
-        //usersLink.setPrefSize(100, 20);
-        //usersLink.setStyle("-fx-text-fill: white;");
-        //usersLink.setOnAction(new EventHandler<ActionEvent>() {
+        ReportsLink.setPrefSize(100, 20);
+        ReportsLink.setStyle("-fx-text-fill: white;");
+        ReportsLink.setOnAction(new EventHandler<ActionEvent>() {
             
-        //    @Override
-        //    public void handle(ActionEvent event) { 
-        //    }
-        //});
+            @Override
+            public void handle(ActionEvent event) { 
+                createReportScreen(primaryStage);
+            }
+        });
         
         AppointmentLink.setPrefSize(100, 20);
         AppointmentLink.setStyle("-fx-text-fill: white;");
@@ -244,7 +244,7 @@ public class JavaFXApplication1 extends Application {
         });
         
         VBox vbox = new VBox();
-        vbox.getChildren().addAll(customersLink, AppointmentLink, logOffLink);
+        vbox.getChildren().addAll(customersLink, AppointmentLink, ReportsLink, logOffLink);
         //vbox.getChildren().add(button);
         vbox.setSpacing(5);
         vbox.setStyle("-fx-background-color: #336699;");  
@@ -264,7 +264,7 @@ public class JavaFXApplication1 extends Application {
         final Hyperlink AppointmentScheduleByCountry = new Hyperlink("Appointments by Country");
         final Hyperlink MainMenuLink = new Hyperlink("MainMenu");
                
-        AppointmentTypesByMonthReport.setPrefSize(100, 20);
+        AppointmentTypesByMonthReport.setPrefSize(300, 20);
         AppointmentTypesByMonthReport.setStyle("-fx-text-fill: white;");
         AppointmentTypesByMonthReport.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -273,16 +273,18 @@ public class JavaFXApplication1 extends Application {
             }
         });
         
-        ConsultantSchedule.setPrefSize(100, 20);
+        ConsultantSchedule.setPrefSize(200, 20);
         ConsultantSchedule.setStyle("-fx-text-fill: white;");
         ConsultantSchedule.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                CalandarView cal = new CalandarView();
+                cal.CalandarView(primaryStage);
                 //createConsultantScheduleReportScreen(primaryStage);
             }
         });
         
-        AppointmentScheduleByCountry.setPrefSize(100, 20);
+        AppointmentScheduleByCountry.setPrefSize(200, 20);
         AppointmentScheduleByCountry.setStyle("-fx-text-fill: white;");
         AppointmentScheduleByCountry.setOnAction(new EventHandler<ActionEvent>() {       
             @Override
@@ -291,7 +293,7 @@ public class JavaFXApplication1 extends Application {
             }
         });
         
-        MainMenuLink.setPrefSize(100, 20);
+        MainMenuLink.setPrefSize(200, 20);
         MainMenuLink.setStyle("-fx-text-fill: white;");
         MainMenuLink.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -315,19 +317,75 @@ public class JavaFXApplication1 extends Application {
     }
     //createAppointmentTypesByMonthReport
     public void createAppointmentTypesByMonthReport(Stage primaryStage){
-        try {
+        try {        
+            final TextArea textArea = new TextArea();
+            textArea.setPrefSize(400, 320);
             Button runReportButton = new Button("Run Report");
+            //Run Report Button Handle
+            runReportButton.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                                //
+                    Dal dal = new Dal();
+                    ArrayList<Appointment> appts =  dal.getAllAppointments();
+                    List<AppointmentTypeRpt> apptRpt = new ArrayList<AppointmentTypeRpt>();
+                    //Set year
+                    int year = Calendar.getInstance().get(Calendar.YEAR);
+                    appts.forEach(appt -> {
+                        Calendar cal = Calendar.getInstance();
+                        cal.setTime(appt.start);
+
+                        if (cal.get(Calendar.YEAR) == year) 
+                        {
+                            apptRpt.add(new AppointmentTypeRpt(year, cal.get(Calendar.MONTH), appt.title));
+                        };
+                    });
+                    //Map<Integer, Map<String,List<AppointmentTypeRpt>>> appointmentsByType =  apptRpt.stream().collect(Collectors.groupingBy(AppointmentTypeRpt::getMonth), Collectors.groupingBy(AppointmentTypeRpt::getApptType));
+                    Map<Integer, Map<String, List<AppointmentTypeRpt>>> appointmentsByTypeCollection = apptRpt.stream().collect(Collectors.groupingBy(AppointmentTypeRpt::getMonth, Collectors.groupingBy(AppointmentTypeRpt::getApptType, Collectors.toList())));
+                    //TextOutput
+                    StringBuilder rptResult = new StringBuilder();
+                    //2 foreachs
+                    //Outer foreach // Month
+                    for(int m=1; m<=12; m++) {
+                        try{
+                        rptResult.append("Month " + Utility.getMonth(m) + " Number of New Client Appts: " + appointmentsByTypeCollection.get(m).get("New Client").size() + "\n");
+                        } catch(Exception ex) {}
+                        try{
+                        rptResult.append("Month " + Utility.getMonth(m) + " Number of Maintenance Appt Appts: " + appointmentsByTypeCollection.get(m).get("Maintenance Appt").size() + "\n");
+                        } catch(Exception ex) {}
+                        try{
+                        rptResult.append("Month " + Utility.getMonth(m) + " Number of Prospect Appts: " + appointmentsByTypeCollection.get(m).get("Prospect").size() + "\n");
+                        } catch(Exception ex) {}
+                    }
+                    //Inner foreach //Appt Type 
+                    //"New Client",
+                    //"Maintenance Appt",
+                    //"Prospect"
+                    textArea.setText(rptResult.toString());
+                }
+            });
+            Button rptMenuButton = new Button("Return to reports"); 
+            rptMenuButton.setPrefSize(150, 20);
+
+            rptMenuButton.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) { 
+                    createReportScreen(primaryStage);
+                }
+            });
+            
+            VBox vb = new VBox();
             HBox hb = new HBox();
             
             ComboBox<Customer> customerMenu = new ComboBox<Customer>(FXCollections.observableList(Dal.retrieveCustomers()));
             
-            hb.getChildren().addAll(customerMenu);
+            hb.getChildren().addAll(runReportButton, rptMenuButton);
             hb.setSpacing(10);
             
-
+            vb.getChildren().addAll(hb, textArea);
             
             //Create Customers stage
-            scene = new Scene(hb, 600, 350);
+            scene = new Scene(vb, 600, 350);
             hb.requestFocus();
             
             primaryStage.setTitle("Create Customer");

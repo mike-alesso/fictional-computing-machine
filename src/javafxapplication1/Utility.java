@@ -17,6 +17,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DateFormatSymbols;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -66,11 +67,11 @@ public class Utility {
         return tzdList;
     }
     
-    public static void login(String userName, String password, String country, TimeZoneDisplay timeZone) throws SQLException, IOException, InvalidLoginException {
+    public static void login(String userName, String password, String country) throws SQLException, IOException, InvalidLoginException {
         if(Dal.checkCredentials(userName, password)) {
             currentUserName = userName;
             isAuthenticated = true;
-            currentUserTimeZone = ZoneId.of(timeZone.getZone());
+            currentUserTimeZone = ZoneId.systemDefault();
             //Requirement J: append login information to a log file
             Charset charSetOfLog = Charset.forName("US-ASCII");
             ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
@@ -146,5 +147,9 @@ public class Utility {
                     alert.showAndWait();
            }
         });
+    }
+      
+    public static String getMonth(int month) {
+        return new DateFormatSymbols().getMonths()[month-1];
     }
 }
